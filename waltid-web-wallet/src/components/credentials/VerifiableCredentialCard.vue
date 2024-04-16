@@ -1,38 +1,24 @@
 <template>
     <div ref="vcCardDiv"
-    :class="{ 'bg-white p-6 rounded-2xl shadow-2xl h-full text-gray-900': true, 'lg:w-[400px]': isDetailView }">
-        <div class="flex justify-end gap-1.5">
-            <CredentialIcon :credentialType="title" class="h-6 w-6 p-0.5 flex-none rounded-full backdrop-contrast-50 justify-self-start" />
-            <div :class="credential.expirationDate ? (isNotExpired ? 'bg-cyan-100' : 'bg-red-50') : 'bg-cyan-50'" class="rounded-lg px-3 mb-2">
-                <span :class="isNotExpired ? 'text-cyan-900' : 'text-orange-900'">
-                    {{ isNotExpired ? "Valid" : "Expired" }}
-                </span>
-            </div>
-
-            <div v-if="credential._sd" class="rounded-lg px-3 mb-2 bg-cyan-100">
-                <span>SD</span>
-            </div>
-
-            <div v-if="manifest" class="rounded-lg px-3 mb-2 text-cyn-100 bg-cyan-400">
-                <span>Entra</span>
-            </div>
+        :class="{ 'p-6 rounded-2xl shadow-2xl h-full text-gray-900': true, 'lg:w-[400px]': isDetailView, 'bg-[#0573F0] border-t-white border-t-[0.5px]': isNotExpired, 'bg-[#7B8794]': !isNotExpired }">
+        <div class="flex justify-end" v-if="!isNotExpired">
+            <div class="text-black bg-[#CBD2D9] px-2 py-1 rounded-full text-xs">Expired</div>
         </div>
 
         <div class="mb-8">
-            <div class="text-2xl font-bold bold">
-                    {{ titleTitelized }}
-            </div>
-            <p v-if="credentialSubtitle" class="text-sm text-clip">{{ credentialSubtitle }}</p>
-        </div>
-
-        <div v-if="issuerName" class="flex items-center">
-            <img v-if="credentialImageUrl" :src="credentialImageUrl" alt="Issuer image" class="w-12" />
-            <div class="text-natural-600 ml-2 w-32">
-                {{ issuerName }}
+            <div class="text-2xl font-bold bold text-white">
+                {{ titleTitelized }}
             </div>
         </div>
 
-        <div v-if="showId" class="font-mono mt-3">ID: {{ credential.id }}</div>
+        <div>
+            <div :class="{ 'text-white': issuerName, 'text-[#0573F0]': !issuerName }">Issuer</div>
+            <div :class="{ 'text-white': issuerName, 'text-[#0573F0]': !issuerName }" class="font-bold">
+                {{ issuerName ?? 'Unknown' }}
+            </div>
+        </div>
+
+        <div v-if="showId" class="font-mono mt-3">ID: {{ credential?.id }}</div>
     </div>
 </template>
 
@@ -64,11 +50,11 @@ const title = manifestDisplay?.title ?? credential?.type?.at(-1);
 const titleTitelized = manifestDisplay?.title ?? credential?.type?.at(-1).replace(/([a-z0-9])([A-Z])/g, "$1 $2");
 const credentialSubtitle = manifestCard?.description ?? credential?.name;
 
-const credentialImageUrl = manifestCard?.logo?.uri ?? credential.issuer?.image?.id ?? credential.issuer?.image;
+const credentialImageUrl = manifestCard?.logo?.uri ?? credential?.issuer?.image?.id ?? credential?.issuer?.image;
 
-const isNotExpired = credential.expirationDate ? new Date(credential.expirationDate).getTime() > new Date().getTime() : true;
+const isNotExpired = credential?.expirationDate ? new Date(credential?.expirationDate).getTime() > new Date().getTime() : true;
 
-const issuerName = manifestCard?.issuedBy ?? credential.issuer?.name;
+const issuerName = manifestCard?.issuedBy ?? credential?.issuer?.name;
 
 const vcCardDiv = ref(null)
 
