@@ -1,31 +1,25 @@
 <template>
-    <CenterMain>
-        <BackButton />
-        <div>
-            <QrCodeScanner @request="startRequest" />
-
-            <div class="relative my-8">
-                <div aria-hidden="true" class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300" />
-                </div>
-                <div class="relative flex justify-center">
-                    <span class="bg-white px-2 text-sm text-gray-500">or</span>
-                </div>
-            </div>
-
-            <ManualRequestEntry @request="startRequest" />
+    <div class="bg-[#3E4C59] opacity-50">
+        <div class="absolute top-3 left-3 cursor-pointer bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-black text-xs font-bold"
+            @click="navigateTo({ path: `/wallet/${walletId}` })">X</div>
+        <div class="flex flex-col justify-center items-center h-[100vh]">
+            <QrCodeScanner v-if="qrCodeDisplay" @qrCode="startRequest" />
+            <ManualRequestEntry v-else @request="startRequest" />
+            <toggle class="mt-10" @update:option1-selected="qrCodeDisplay = $event" :options="['QR Code', 'Manual']" />
         </div>
-    </CenterMain>
+    </div>
 </template>
 
 <script setup>
-import QrCodeScanner from "~/components/scan/QrCodeScanner.vue";
-import BackButton from "~/components/buttons/BackButton.vue";
-import CenterMain from "~/components/CenterMain.vue";
 import ManualRequestEntry from "~/components/scan/ManualRequestEntry.vue";
 import { encodeRequest, fixRequest } from "~/composables/siop-requests";
+import QrCodeScanner from "~/components/scan/QrCodeScanner.vue";
+import toggle from "~/components/toggle.vue";
 
-const currentWallet = useCurrentWallet()
+const route = useRoute();
+const walletId = route.params.wallet;
+
+const qrCodeDisplay = ref(true);
 
 async function startRequest(request) {
     console.log("Start request:", request);
@@ -45,12 +39,16 @@ async function startRequest(request) {
     }
 }
 
-function redirectByOfferType(offerUrl, encoded){
-    if(offerUrl.startsWith("openid-vc://")){
+function redirectByOfferType(offerUrl, encoded) {
+    if (offerUrl.startsWith("openid-vc://")) {
         return navigateTo({ path: `/wallet/${currentWallet.value}/exchange/entra/issuance`, query: { request: encoded } });
-    }else{
+    } else {
         return navigateTo({ path: `/wallet/${currentWallet.value}/exchange/issuance`, query: { request: encoded } });
     }
 }
+
+definePageMeta({
+    layout: false,
+});
 </script>
 <style scoped></style>

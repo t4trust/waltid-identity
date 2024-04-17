@@ -1,32 +1,24 @@
 <template>
-    <form action="#" @submit.prevent="startRequest">
-        <div class="mt-2">
+    <form action="#" @submit.prevent="startRequest" class="w-[90%]">
+        <div class="my-2">
             <div class="-m-0.5 rounded-lg p-0.5">
-                <label class="sr-only" for="comment">Manual request entry</label>
-                <div>
-                    <textarea
-                        id="comment"
-                        v-model="text"
-                        autofocus="autofocus"
+                <label class="text-[#E6F6FF] font-bold" for="comment">URL</label>
+                <div class="mt-2">
+                    <input id="comment" v-model="text" autofocus="autofocus"
                         class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                        name="comment"
-                        placeholder="Enter request string manually..."
-                        rows="5"
-                    />
+                        name="comment" />
                 </div>
             </div>
         </div>
-        <div class="mt-2 flex justify-end">
-            <button
-                v-if="status === 'empty' || status === 'ok'"
-                ref="submitBtn"
+        <div class="mt-2 flex justify-center">
+            <button v-if="status === 'empty' || status === 'ok'" ref="submitBtn"
                 :disabled="status === 'empty' || text.value == ''"
-                class="inline-flex disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-gray-500 items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                type="submit"
-            >
+                class="inline-flex disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-gray-500 items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-[#E6F6FF] shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                type="submit">
                 {{ requestTypeName }}
             </button>
-            <p v-else-if="status === 'error'" class="px-3 py-2 text-sm font-semibold text-red-600 animate-pulse">Not a valid SIOP request string!</p>
+            <p v-else-if="status === 'error'" class="px-3 py-2 text-sm font-semibold text-red-600 animate-pulse">Not a
+                valid SIOP request string!</p>
         </div>
     </form>
 </template>
@@ -58,7 +50,7 @@ const requestType = computed(() => {
 
 const requestTypeName = computed(() => {
     if (requestType.value == null) {
-        return "Paste request string first...";
+        return "Provide URL shared by issuer or verifier";
     } else if (requestType.value === SiopRequestType.PRESENTATION) {
         return "Present credential!";
     } else if (requestType.value === SiopRequestType.ISSUANCE) {

@@ -1,8 +1,6 @@
 export function useTenant() {
     return useState("tenant-config", async () => {
-        console.log("Getting tenant config...");
         const config = useAppConfig();
-        console.log("App config: ", config);
 
         if (config.enableCloudTenants) {
             const baseTenantDomain = useRequestURL().host.replace(":3000", ":8080");

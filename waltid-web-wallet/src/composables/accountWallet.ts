@@ -21,7 +21,6 @@ export function setWallet(
     newWallet: string | null,
     redirectUri: ((walletId: string) => string) | undefined = (walletId) => `/wallet/${walletId}`
 ) {
-    console.log("New wallet: ", newWallet);
     useCurrentWallet().value = newWallet;
 
     if (newWallet != null && redirectUri != undefined)

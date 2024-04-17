@@ -1,11 +1,6 @@
 <template>
     <div class="flex flex-col items-center">
-        <!-- Menu bar -->
-        <div v-if="noError" class="text-center">
-            <p class="font-semibold">QR code scanner</p>
-            <p>Scan your credential presentation requests and issuance offers:</p>
-        </div>
-        <div v-if="videoStarted && noError">
+        <!-- <div v-if="videoStarted && noError">
             <div class="inline-flex flex-row justify-between gap-3 p-2">
                 <WaltButton :icon="ChevronUpDownIcon"> Choose camera </WaltButton>
                 <WaltButton :icon="ArrowPathRoundedSquareIcon"> Switch direction </WaltButton>
@@ -16,24 +11,32 @@
                     <XMarkIcon class="w-8 h-8 absolute text-gray-600" />
                 </div>
             </div>
-        </div>
-
-        <!-- Loading indicator -->
-        <LoadingIndicator v-if="isLoading || (!videoStarted && noError)">Camera initializing...</LoadingIndicator>
+        </div> -->
 
         <!-- Video feed -->
-        <div :class="[(!videoStarted && isLoading) || !noError ? 'hidden' : '']" class="flex place-content-center place-items-center">
+        <div :class="[(!videoStarted && isLoading) || !noError ? 'hidden' : '']"
+            class="flex place-content-center place-items-center mb-6">
             <VideoCameraIcon v-if="!scanned" class="absolute h-7 w-7 animate-ping" />
             <video id="scanner-video" ref="scannerVideo" class="border"></video>
         </div>
 
+        <!-- Menu bar -->
+        <div v-if="noError" class="text-center">
+            <p class="font-semibold text-[#E6F6FF]">Scan Code</p>
+            <p class="text-[#E6F6FF]">Scan QR codes to receive or present credentials</p>
+        </div>
+
+        <!-- Loading indicator -->
+        <LoadingIndicator class="text-[#E6F6FF]" v-if="isLoading || (!videoStarted && noError)">Camera initializing...
+        </LoadingIndicator>
+
         <!-- Error indicator -->
-        <div v-if="!noError" class="bg-white px-4 py-5 sm:px-6 shadow">
+        <div v-if="!noError" class="px-4 py-5 sm:px-6">
             <div class="flex flex-row gap-1.5 place-items-center">
-                <VideoCameraSlashIcon class="w-5 h-5" />
-                <p class="font-semibold">{{ error.title }}</p>
+                <VideoCameraSlashIcon class="w-5 h-5 text-[#E6F6FF]" />
+                <p class="font-semibold text-[#E6F6FF]">{{ error.title }}</p>
             </div>
-            <p>{{ error.message }}</p>
+            <p class="text-[#E6F6FF]">{{ error.message }}</p>
         </div>
     </div>
 </template>
@@ -68,10 +71,7 @@ function throwError(newError) {
 
 async function startVideo() {
     if (await QrScanner.hasCamera()) {
-        console.log("Starting video");
-        console.log("Camera list", await QrScanner.listCameras());
         try {
-            console.log("Creating QR scanner...");
             qrScanner = new QrScanner(
                 scannerVideo.value,
                 (result) => {
@@ -92,11 +92,9 @@ async function startVideo() {
                     returnDetailedScanResult: true,
                 },
             );
-            console.log("Starting QR scanner...");
             isLoading.value = false;
             await qrScanner.start();
             videoStarted.value = true;
-            console.log("Started QR scanner!");
         } catch (exception) {
             throwError({
                 title: "Could not start camera",
