@@ -18,6 +18,7 @@ import toggle from "~/components/toggle.vue";
 
 const route = useRoute();
 const walletId = route.params.wallet;
+const currentWallet = useCurrentWallet();
 
 const qrCodeDisplay = ref(true);
 

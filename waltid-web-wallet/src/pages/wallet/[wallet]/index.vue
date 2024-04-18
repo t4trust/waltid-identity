@@ -37,7 +37,7 @@ import { QrCodeIcon } from "@heroicons/vue/24/outline";
 const route = useRoute();
 const walletId = route.params.wallet;
 
-const { data: credentials, pending, refresh, error } = await useLazyFetch(`/wallet-api/wallet/${walletId}/credentials`);
+const { data: credentials, pending, refresh, error } = await useLazyFetch(`/wallet-api/wallet/${walletId}/credentials?showDeleted=false&showPending=false`);
 refreshNuxtData();
 
 definePageMeta({
