@@ -8,14 +8,16 @@
                 <slot />
             </main>
 
-            <hr class="border-t border-gray-200" aria-hidden="true" />
-            <nav class="flex justify-between bg-white px-4 py-2" aria-label="Bottom navigation">
-                <NuxtLink v-for="item in navigation" :key="item.name" :to="item.href"
-                    class="flex flex-col items-center text-sm text-gray-500 hover:text-gray-900">
-                    <component :is="item.icon" class="h-6 w-6" />
-                    <span class="mt-1">{{ item.name }}</span>
-                </NuxtLink>
-            </nav>
+            <div class="fixed bottom-0 inset-x-0">
+                <hr class="border-t border-gray-200" aria-hidden="true" />
+                <nav class="flex justify-between bg-white px-4 py-2" aria-label="Bottom navigation">
+                    <NuxtLink v-for="item in navigation" :key="item.name" :to="item.href"
+                        class="flex flex-col items-center text-sm text-gray-500 hover:text-gray-900">
+                        <span v-html="item.icon" class="mt-1"></span>
+                        <span class="mt-1">{{ item.name }}</span>
+                    </NuxtLink>
+                </nav>
+            </div>
         </div>
     </div>
 </template>
@@ -23,12 +25,9 @@
 <script lang="ts" setup>
 import {
     CogIcon,
-    HomeIcon,
     ListBulletIcon,
     QuestionMarkCircleIcon,
     ShieldCheckIcon,
-    ArchiveBoxIcon,
-    UserCircleIcon,
 } from "@heroicons/vue/24/outline";
 import { useCurrentWallet } from "~/composables/accountWallet";
 import { useTenant } from "~/composables/tenants";
@@ -39,22 +38,26 @@ const logoImage = tenant?.logoImage
 const inWalletLogoImage = tenant?.inWalletLogoImage
 
 const currentWallet = useCurrentWallet()
+
+const stackOfCardsSVG = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" /></svg>'
+const profileSVG = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>'
+
 const navigation = [
 
     {
         name: "Home",
         href: `/wallet/${currentWallet.value}`,
-        icon: HomeIcon,
+        icon: stackOfCardsSVG,
     },
     {
         name: "Request",
         href: `/wallet/${currentWallet.value}/settings/issuers`,
-        icon: ArchiveBoxIcon,
+        icon: stackOfCardsSVG,
     },
     {
         name: "Profile",
         href: `/wallet/${currentWallet.value}/profile`,
-        icon: UserCircleIcon,
+        icon: profileSVG,
     }
 ];
 const secondaryNavigation = [

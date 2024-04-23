@@ -55,7 +55,7 @@
 
                             <div>
                                 <button
-                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-blue-600  hover:bg-blue-500']"
+                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-gradient-to-br from-[#0573F0] to-[#03449E] hover:bg-blue-500']"
                                     class="flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                                     type="submit">
                                     Sign Up

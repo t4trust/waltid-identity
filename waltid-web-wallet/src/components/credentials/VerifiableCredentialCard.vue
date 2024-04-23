@@ -1,6 +1,6 @@
 <template>
     <div ref="vcCardDiv"
-        :class="{ 'p-6 rounded-2xl shadow-2xl h-full text-gray-900': true, 'lg:w-[400px]': isDetailView, 'bg-[#0573F0] border-t-white border-t-[0.5px]': isNotExpired, 'bg-[#7B8794]': !isNotExpired }">
+        :class="{ 'p-6 rounded-2xl shadow-2xl h-full text-gray-900': true, 'lg:w-[400px]': isDetailView, 'bg-gradient-to-br from-[#0573F0] to-[#03449E] border-t-white border-t-[0.5px]': isNotExpired, 'bg-[#7B8794]': !isNotExpired }">
         <div class="flex justify-end" v-if="!isNotExpired">
             <div class="text-black bg-[#CBD2D9] px-2 py-1 rounded-full text-xs">Expired</div>
         </div>

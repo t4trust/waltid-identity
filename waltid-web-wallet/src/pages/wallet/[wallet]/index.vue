@@ -23,8 +23,8 @@
     <div class="fixed bottom-20 right-5 lg:hidden">
         <NuxtLink :to="`/wallet/${walletId}/scan`">
             <button
-                class="flex items-center justify-center h-14 w-14 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                <QrCodeIcon aria-hidden="true" class="h-8 w-8" />
+                class="flex items-center justify-center h-14 w-14 rounded-full bg-black text-white shadow-lg hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <img :src="scannerSVG" alt="Scan QR code" class="h-6 w-6" />
             </button>
         </NuxtLink>
     </div>
@@ -32,7 +32,7 @@
 
 <script setup>
 import VerifiableCredentialCard from "~/components/credentials/VerifiableCredentialCard.vue";
-import { QrCodeIcon } from "@heroicons/vue/24/outline";
+import scannerSVG from "~/public/svg/scanner.svg";
 
 const route = useRoute();
 const walletId = route.params.wallet;

@@ -36,10 +36,10 @@
                                             for="password">
                                             <span class="flex flex-row items-center">Password</span>
                                         </label>
-                                        <NuxtLink class="text-sm font-medium text-[#7B8794] hover:text-blue-500"
+                                        <!-- <NuxtLink class="text-sm font-medium text-[#7B8794] hover:text-blue-500"
                                             to="/forgot-password">
                                             Forgot password
-                                        </NuxtLink>
+                                        </NuxtLink> -->
                                     </div>
                                     <div class="mt-1">
                                         <input id="password" v-model="passwordInput" autocomplete="current-password"
@@ -50,7 +50,7 @@
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <button
-                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-blue-600  hover:bg-blue-500']"
+                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-gradient-to-br from-[#0573F0] to-[#03449E] hover:bg-blue-500']"
                                     class="flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                                     type="submit">
                                     Sign in
@@ -163,14 +163,21 @@ async function login() {
         email: emailInput,
         password: passwordInput,
     };
-    await signIn({ email: emailInput, password: passwordInput, type: "email" }, { callbackUrl: signInRedirectUrl.value })
-        .then((data) => {
+    await signIn({ email: emailInput, password: passwordInput, type: "email" }, { redirect: false })
+        .then(async (data) => {
+            const wallets = (await listWallets())?.value?.wallets;
+
             user.value = {
                 id: "",
                 email: userData.email,
             };
             success.value = true;
             isLoggingIn.value = false;
+
+            if (wallets) {
+                setWallet(wallets[0].id);
+                navigateTo(`/wallet/${wallets[0].id}`);
+            }
         })
         .catch((err) => {
             console.log("Could not sign in", err);

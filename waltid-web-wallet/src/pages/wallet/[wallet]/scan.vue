@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#3E4C59] opacity-50">
+    <div class="bg-[#3e4c597d]">
         <div class="absolute top-3 left-3 cursor-pointer bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-black text-xs font-bold"
             @click="navigateTo({ path: `/wallet/${walletId}` })">X</div>
         <div class="flex flex-col justify-center items-center h-[100vh]">
