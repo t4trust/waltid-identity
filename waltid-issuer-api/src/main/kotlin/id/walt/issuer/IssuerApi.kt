@@ -1,19 +1,17 @@
 package id.walt.issuer
 
 import id.walt.credentials.vc.vcs.W3CVC
-import id.walt.crypto.keys.Key
+import id.walt.crypto.keys.KeyManager
 import id.walt.crypto.keys.KeySerialization
-import id.walt.crypto.keys.KeyType
-import id.walt.crypto.keys.jwk.JWKKey
-import id.walt.crypto.keys.tse.TSEKey
-import id.walt.crypto.keys.tse.TSEKeyMetadata
 import id.walt.did.dids.DidService
-import id.walt.did.dids.registrar.dids.DidCreateOptions
 import id.walt.issuer.IssuanceExamples.batchExample
 import id.walt.issuer.IssuanceExamples.issuerOnboardingRequestDefaultExample
 import id.walt.issuer.IssuanceExamples.issuerOnboardingRequestDidWebExample
+import id.walt.issuer.IssuanceExamples.issuerOnboardingRequestOciExample
 import id.walt.issuer.IssuanceExamples.issuerOnboardingRequestTseExample
 import id.walt.issuer.IssuanceExamples.issuerOnboardingResponseDefaultExample
+import id.walt.issuer.IssuanceExamples.issuerOnboardingResponseDidWebExample
+import id.walt.issuer.IssuanceExamples.issuerOnboardingResponseOciExample
 import id.walt.issuer.IssuanceExamples.issuerOnboardingResponseTseExample
 import id.walt.issuer.IssuanceExamples.openBadgeCredentialExampleJsonString
 import id.walt.issuer.IssuanceExamples.sdJwtExample
@@ -32,12 +30,16 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration.Companion.minutes
 
 private val logger = KotlinLogging.logger {}
-suspend fun createCredentialOfferUri(issuanceRequests: List<BaseIssuanceRequest>): String {
-    val credentialOfferBuilder = OidcIssuance.issuanceRequestsToCredentialOfferBuilder(issuanceRequests)
+suspend fun createCredentialOfferUri(issuanceRequests: List<IssuanceRequest>): String {
+    val credentialOfferBuilder =
+        OidcIssuance.issuanceRequestsToCredentialOfferBuilder(issuanceRequests)
 
     val issuanceSession = OidcApi.initializeCredentialOffer(
         credentialOfferBuilder = credentialOfferBuilder, expiresIn = 5.minutes, allowPreAuthorized = true
@@ -76,11 +78,15 @@ fun Application.issuerApi() {
                     body<IssuerOnboardingRequest> {
                         description = "Issuer onboarding request (key & DID) config."
                         example("did:jwk + JWK key (Ed25519)", issuerOnboardingRequestDefaultExample)
+                        example("did:web + JWK key (Secp256k1)", issuerOnboardingRequestDidWebExample)
                         example(
-                            "did:key + TSE (Hashicorp Vault Transit Engine key - RSA)",
+                            "did:key + TSE key (Hashicorp Vault Transit Engine - RSA)",
                             issuerOnboardingRequestTseExample
                         )
-                        example("did:web + JWK key (Secp256k1)", issuerOnboardingRequestDidWebExample)
+                        example(
+                            "did:jwk + OCI key (Oracle Cloud Infrastructure - Secp256r1)",
+                            issuerOnboardingRequestOciExample
+                        )
                         required = true
                     }
                 }
@@ -90,50 +96,47 @@ fun Application.issuerApi() {
                         description = "Issuer onboarding response"
                         body<IssuerOnboardingResponse> {
                             example(
-                                "did:web + JWK key (Secp256r1)",
+                                "Local JWK key (Secp256r1) + did:jwk",
                                 issuerOnboardingResponseDefaultExample,
                             )
                             example(
-                                "did:key + TSE (Hashicorp Vault Transit Engine key - Ed25519)",
+                                "Local JWK key (Secp256r1) + did:web",
+                                issuerOnboardingResponseDidWebExample,
+                            )
+                            example(
+                                "Remote TSE Ed25519 key + did:key",
                                 issuerOnboardingResponseTseExample,
+                            )
+                            example(
+                                "Remote OCI Secp256r1 key + did:jwk",
+                                issuerOnboardingResponseOciExample,
                             )
                         }
                     }
                 }
             }) {
-                val req = context.receive<IssuerOnboardingRequest>()
+                val req = context.receive<OnboardingRequest>()
 
-                logger.debug { "Onboarding issuer according config: $req" }
+                val keyConfig = req.keyGenerationRequest.config?.mapValues { (key, value) ->
+                    if (key == "signingKeyPem") {
+                        JsonPrimitive(value.jsonPrimitive.content.trimIndent().replace(" ", ""))
 
-                // Generate key
+                    } else {
+                        value
+                    }
+                }
 
-                val keyType = getParamOrThrow(
-                    req.issuerKeyConfig["type"], "Mandatory issuerKeyConfig param 'type' not provided"
-                )
-                val keyAlgorithm = getParamOrThrow(
-                    req.issuerKeyConfig["algorithm"], "Mandatory issuerKeyConfig param 'algorithm' not provided"
-                ).let { KeyType.valueOf(it) }
+                val keyGenerationRequest =
+                    req.keyGenerationRequest.copy(config = keyConfig?.let { it1 -> JsonObject(it1) })
 
-                val (key, jsonKey) = generateJsonKey(keyType, keyAlgorithm, req)
 
-                logger.debug { "Key created: $key" }
+                val key = KeyManager.createKey(keyGenerationRequest)
 
-                // Generate DID
-
-                val didMethod = getParamOrThrow(
-                    req.issuerDidConfig["method"], "Mandatory issuerDidConfig param 'method' not provided"
-                )
-
-                val didDoc = DidService.registerByKey(
-                    didMethod,
-                    key,
-                    DidCreateOptions(didMethod, req.issuerDidConfig as JsonElement)
-                )
-
-                logger.debug { "DID created: $didDoc" }
+                val did = DidService.registerDefaultDidMethodByKey(req.didMethod, key, req.didConfig).did
+                val serializedKey = KeySerialization.serializeKeyToJson(key)
 
                 context.respond(
-                    HttpStatusCode.OK, IssuerOnboardingResponse(jsonKey, didDoc)
+                    HttpStatusCode.OK, IssuerOnboardingResponse(serializedKey, did)
                 )
             }
         }
@@ -151,7 +154,7 @@ fun Application.issuerApi() {
                         request {
                             headerParameter<String>("walt-key") {
                                 description =
-                                    "Supply a core-crypto key representation to use to issue the credential, " + "e.g. a local key (internal JWK) or a TSE key."
+                                    "Supply a  key representation to use to issue the credential, " + "e.g. a local key (internal JWK) or a TSE key."
                                 example = mapOf(
                                     "type" to "jwk", "jwk" to "{ ... }"
                                 )
@@ -221,7 +224,7 @@ fun Application.issuerApi() {
                         description = "This endpoint issues a W3C Verifiable Credential, and returns an issuance URL "
 
                         request {
-                            body<JwtIssuanceRequest> {
+                            body<IssuanceRequest> {
                                 description =
                                     "Pass the unsigned credential that you intend to issue as the body of the request."
                                 example("OpenBadgeCredential example", openBadgeCredentialExampleJsonString)
@@ -242,7 +245,7 @@ fun Application.issuerApi() {
                             }
                         }
                     }) {
-                        val jwtIssuanceRequest = context.receive<JwtIssuanceRequest>()
+                        val jwtIssuanceRequest = context.receive<IssuanceRequest>()
                         val offerUri = createCredentialOfferUri(listOf(jwtIssuanceRequest))
 
                         context.respond(
@@ -255,7 +258,7 @@ fun Application.issuerApi() {
                             "This endpoint issues a list W3C Verifiable Credentials, and returns an issuance URL "
 
                         request {
-                            body<List<JwtIssuanceRequest>> {
+                            body<List<IssuanceRequest>> {
                                 description =
                                     "Pass the unsigned credential that you intend to issue as the body of the request."
                                 example("Batch example", batchExample)
@@ -277,7 +280,7 @@ fun Application.issuerApi() {
                     }) {
 
 
-                        val issuanceRequests = context.receive<List<JwtIssuanceRequest>>()
+                        val issuanceRequests = context.receive<List<IssuanceRequest>>()
                         val offerUri = createCredentialOfferUri(issuanceRequests)
                         logger.debug { "Offer URI: $offerUri" }
 
@@ -292,7 +295,7 @@ fun Application.issuerApi() {
                         description = "This endpoint issues a W3C Verifiable Credential, and returns an issuance URL "
 
                         request {
-                            body<SdJwtIssuanceRequest> {
+                            body<IssuanceRequest> {
                                 description =
                                     "Pass the unsigned credential that you intend to issue as the body of the request."
                                 example("SD-JWT example", sdJwtExample)
@@ -313,7 +316,7 @@ fun Application.issuerApi() {
                             }
                         }
                     }) {
-                        val sdJwtIssuanceRequest = context.receive<SdJwtIssuanceRequest>()
+                        val sdJwtIssuanceRequest = context.receive<IssuanceRequest>()
 
                         val offerUri = createCredentialOfferUri(listOf(sdJwtIssuanceRequest))
 
@@ -330,7 +333,7 @@ fun Application.issuerApi() {
                         request {
                             headerParameter<String>("walt-key") {
                                 description =
-                                    "Supply a core-crypto key representation to use to issue the credential, " + "e.g. a local key (internal JWK) or a TSE key."
+                                    "Supply a  key representation to use to issue the credential, " + "e.g. a local key (internal JWK) or a TSE key."
                                 example = mapOf(
                                     "type" to "jwk", "jwk" to "{ ... }"
                                 )
@@ -358,44 +361,3 @@ fun Application.issuerApi() {
         }
     }
 }
-
-private suspend fun generateJsonKey(
-    keyType: String, keyAlgorithm: KeyType, req: IssuerOnboardingRequest
-): Pair<Key, JsonElement> {
-    val key = when (keyType) {
-        "jwk" -> JWKKey.generate(keyAlgorithm)
-        "tse" -> TSEKey.generate(
-            keyAlgorithm, TSEKeyMetadata(
-                getParamOrThrow(
-                    req.issuerKeyConfig["tseServer"], "Mandatory issuerKeyConfig param 'tseServer' not provided"
-                ), getParamOrThrow(
-                    req.issuerKeyConfig["tseAccessToken"],
-                    "Mandatory issuerKeyConfig param 'tseAccessToken' not provided"
-                )
-            )
-        )
-
-        else -> {
-            JWKKey.generate(KeyType.Ed25519)
-        }
-    }
-
-    // TODO: serialize TSE key the same way as the local key
-    val jsonKey = if (keyType == "tse") {
-        KeySerialization.serializeKeyToJson(key)
-    } else {
-        // TODO: serialized the internal jwk to avoid this construct
-        val jsonKey = """
-                        {
-                            "type" : "${keyType}",
-                            "jwk" : ${key.exportJWKObject()}
-                        }
-                    """.trimIndent()
-        Json.parseToJsonElement(jsonKey)
-    }
-
-    return key to jsonKey
-}
-
-private fun getParamOrThrow(element: JsonElement?, errorMessage: String) =
-    element?.jsonPrimitive?.contentOrNull ?: throw IllegalArgumentException(errorMessage)

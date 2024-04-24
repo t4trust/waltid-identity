@@ -63,7 +63,7 @@ dependencies {
     implementation("io.ktor:ktor-server-method-override:$ktorVersion")
 
     // Ktor server external libs
-    implementation("io.github.smiley4:ktor-swagger-ui:2.7.4")
+    implementation("io.github.smiley4:ktor-swagger-ui:2.8.0")
     //implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
 
     // Ktor client
@@ -147,7 +147,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
 
     // Logging
-    implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
     implementation("org.slf4j:slf4j-simple:2.0.12")
     implementation("org.slf4j:jul-to-slf4j:2.0.12")
 
