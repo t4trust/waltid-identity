@@ -108,19 +108,20 @@ watchEffect(() => {
 });
 
 const displayData = computed(() => {
-    if (jwtJson.value.type[jwtJson.value.type.length - 1] == "VerifiableDiploma") {
+    if (jwtJson.value.type[jwtJson.value.type.length - 1] == "eID") {
         return {
-            "Name": JSONPath({ path: "$.credentialSubject.givenNames", json: jwtJson.value }),
-            "Last Name": JSONPath({ path: "$.credentialSubject.familyName", json: jwtJson.value }),
+            "Name": JSONPath({ path: "$.credentialSubject.firstName", json: jwtJson.value }),
+            "Last Name": JSONPath({ path: "$.credentialSubject.lastName", json: jwtJson.value }),
         };
-    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "OpenBadgeCredential") {
+    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "KycDataCredential") {
         return {
-            "Name": JSONPath({ path: "$.credentialSubject.achievement.name", json: jwtJson.value }),
+            "Name": JSONPath({ path: "$.credentialSubject.userData.firstName", json: jwtJson.value }),
+            "Last Name": JSONPath({ path: "$.credentialSubject.userData.familyName", json: jwtJson.value }),
         };
-    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "PermanentResidentCard") {
+    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "KycChecksCredential") {
         return {
-            "Name": JSONPath({ path: "$.credentialSubject.givenName", json: jwtJson.value }),
-            "Last Name": JSONPath({ path: "$.credentialSubject.familyName", json: jwtJson.value }),
+            "Type": JSONPath({ path: "$.credentialSubject.type", json: jwtJson.value }),
+            "Result": JSONPath({ path: "$.credentialSubject.result", json: jwtJson.value }),
         };
     }
 });
