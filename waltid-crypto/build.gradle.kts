@@ -113,19 +113,24 @@ kotlin {
                 implementation("io.ktor:ktor-client-cio:2.3.10")
 
                 // Logging
-                implementation("org.slf4j:slf4j-simple:2.0.12")
+                implementation("org.slf4j:slf4j-simple:2.0.13")
+
+                // Coroutines
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.0")
 
                 // JOSE
                 implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
 
                 // Multibase
 //                implementation("com.github.multiformats:java-multibase:v1.1.1")
+
+                implementation("com.oracle.oci.sdk:oci-java-sdk-shaded-full:3.39.1")
             }
         }
         val jvmTest by getting {
             dependencies {
                 // Logging
-//                implementation("org.slf4j:slf4j-simple:2.0.12")
+//                implementation("org.slf4j:slf4j-simple:2.0.13")
 
                 // Test
                 implementation(kotlin("test"))

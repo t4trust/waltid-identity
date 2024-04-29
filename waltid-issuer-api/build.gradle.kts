@@ -86,7 +86,7 @@ dependencies {
 
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
-    implementation("org.slf4j:slf4j-simple:2.0.12")
+    implementation("org.slf4j:slf4j-simple:2.0.13")
     implementation("org.slf4j:jul-to-slf4j:2.0.12")
 
     // Test
@@ -128,7 +128,9 @@ java {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
-
+tasks.withType<org.gradle.api.tasks.bundling.Zip> {
+    isZip64 = true
+}
 tasks.named<CreateStartScripts>("startScripts") {
     doLast {
         windowsScript.writeText(
