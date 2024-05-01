@@ -12,8 +12,8 @@
         </div>
 
         <div>
-            <div :class="{ 'text-white': issuerName, 'text-[#0573F0]': !issuerName }">Issuer</div>
-            <div :class="{ 'text-white': issuerName, 'text-[#0573F0]': !issuerName }" class="font-bold">
+            <div :class="{ 'text-white': issuerName, 'text-[#0573f000]': !issuerName }">Issuer</div>
+            <div :class="{ 'text-white': issuerName, 'text-[#0573f000]': !issuerName }" class="font-bold">
                 {{ issuerName ?? 'Unknown' }}
             </div>
         </div>
@@ -60,7 +60,7 @@ const vcCardDiv = ref(null)
 
 watchEffect(async () => {
     try {
-        if (manifestCard) {
+        if (vcCardDiv.value && manifestCard) {
             if (manifestCard?.backgroundColor) {
                 vcCardDiv.value.style.background = manifestCard?.backgroundColor
             }

@@ -21,12 +21,13 @@
             <div class="my-10">
                 <VerifiableCredentialCard :credential="credential" :isDetailView="true" />
             </div>
-            <div class="px-4 py-6 shadow-sm bg-white rounded-xl">
+            <div class="px-4 py-6 shadow-sm bg-white rounded-xl" v-if="credentialManifest">
                 <div class="text-gray-600 font-bold mb-4">Credential Details</div>
-                <div v-for="(value, key, index) in displayData" :key="key">
+                <div v-for="(value, key, index) in credentialManifest.claims" :key="key">
                     <div class="text-gray-500">{{ key }}</div>
-                    <div class="text-black">{{ value[0] }}</div>
-                    <hr v-if="index !== Object.keys(displayData).length - 1" class="w-full border-gray-200 my-2" />
+                    <div class="text-black">{{ value }}</div>
+                    <hr v-if="index !== Object.keys(credentialManifest.claims).length - 1"
+                        class="w-full border-gray-200 my-2" />
                 </div>
             </div>
         </div>
@@ -34,17 +35,17 @@
 </template>
 
 <script lang="ts" setup>
-import LoadingIndicator from "~/components/loading/LoadingIndicator.vue";
-import CenterMain from "~/components/CenterMain.vue";
-import BackButton from "~/components/buttons/BackButton.vue";
-import { ref } from "vue";
-import { decodeBase64ToUtf8 } from "~/composables/base64";
 import VerifiableCredentialCard from "~/components/credentials/VerifiableCredentialCard.vue";
+import LoadingIndicator from "~/components/loading/LoadingIndicator.vue";
 import { parseDisclosures } from "~/composables/disclosures";
+import { decodeBase64ToUtf8 } from "~/composables/base64";
+import CenterMain from "~/components/CenterMain.vue";
 import { JSONPath } from "jsonpath-plus";
-import QrcodeVue from 'qrcode.vue'
+import { ref } from "vue";
 
 const route = useRoute();
+const runtimeConfig = useRuntimeConfig()
+
 const walletId = route.params.wallet as string;
 const credentialId = route.params.credentialId as string;
 const currentWallet = useCurrentWallet();
@@ -92,6 +93,16 @@ type WalletCredential = {
 };
 
 const { data: credential, pending, refresh, error } = await useLazyFetch<WalletCredential>(`/wallet-api/wallet/${currentWallet.value}/credentials/${encodeURIComponent(credentialId)}`);
+const { data: credentialManifest } = await useLazyFetch(`${runtimeConfig.public.credentialsRepositoryUrl}/api/manifest/${jwtJson.value?.type[jwtJson.value?.type.length - 1]}`, {
+    transform: (data: { claims: { [key: string]: string; } }) => {
+        return {
+            ...data,
+            claims: Object.fromEntries(Object.entries(data?.claims).map(([key, value]) => {
+                return [key, JSONPath({ path: value, json: jwtJson.value })[0]];
+            })),
+        }
+    },
+});
 refreshNuxtData();
 
 const manifest = computed(() => (credential.value?.manifest && credential.value?.manifest != "{}" ? (typeof credential.value?.manifest === 'string' ? JSON.parse(credential.value?.manifest) : credential.value?.manifest) : null));
@@ -105,25 +116,6 @@ watchEffect(() => {
     issuerName.value = manifest.value?.display?.card?.issuedBy ?? jwtJson.value?.issuer?.name;
     issuerDid.value = manifest.value?.input?.issuer ?? jwtJson.value?.issuer?.id ?? jwtJson.value?.issuer;
     credentialIssuerService.value = manifest.value?.input?.credentialIssuer;
-});
-
-const displayData = computed(() => {
-    if (jwtJson.value.type[jwtJson.value.type.length - 1] == "eID") {
-        return {
-            "Name": JSONPath({ path: "$.credentialSubject.firstName", json: jwtJson.value }),
-            "Last Name": JSONPath({ path: "$.credentialSubject.lastName", json: jwtJson.value }),
-        };
-    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "KycDataCredential") {
-        return {
-            "Name": JSONPath({ path: "$.credentialSubject.userData.firstName", json: jwtJson.value }),
-            "Last Name": JSONPath({ path: "$.credentialSubject.userData.familyName", json: jwtJson.value }),
-        };
-    } else if (jwtJson.value.type[jwtJson.value.type.length - 1] == "KycChecksCredential") {
-        return {
-            "Type": JSONPath({ path: "$.credentialSubject.type", json: jwtJson.value }),
-            "Result": JSONPath({ path: "$.credentialSubject.result", json: jwtJson.value }),
-        };
-    }
 });
 
 const issuanceDate = computed(() => {
