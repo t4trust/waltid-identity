@@ -1,13 +1,26 @@
 <template>
     <div ref="vcCardDiv"
         :class="{ 'p-6 rounded-2xl shadow-2xl h-full text-gray-900': true, 'lg:w-[400px]': isDetailView, 'bg-amber-700 border-t-white border-t-[0.5px]': isNotExpired, 'bg-[#7B8794]': !isNotExpired }">
-        <div class="flex justify-end" v-if="!isNotExpired">
+        <div class="flex justify-end z-10 absolute top-3 right-2" v-if="!isNotExpired">
             <div class="text-black bg-[#CBD2D9] px-2 py-1 rounded-full text-xs">Expired</div>
         </div>
 
-        <div class="mb-8">
-            <div class="text-2xl font-bold bold text-white">
+        <div class="float-right mt-0">
+            <img class="rounded-xl" width="120"
+                :src="credential.credentialSubject?.passportPhoto || credential.credentialSubject?.photo" alt="">
+        </div>
+
+        <div class="mb-3">
+            <div class="text-sm font-bold bold text-white">
                 {{ titleTitelized }}
+            </div>
+            <div class="text-md font-bold bold text-white">
+                {{ credential.credentialSubject?.passportNumber ||
+                    credential.credentialSubject?.uniqueCertificateIdentifier }}
+            </div>
+            <div class="text-sm font-bold bold text-white">
+                {{ credential.credentialSubject?.givenName || credential.credentialSubject?.givenNames }} {{
+                    credential.credentialSubject?.familyName }}
             </div>
         </div>
 
@@ -40,7 +53,8 @@ const props = defineProps({
     },
 });
 
-const credential = props.credential?.parsedDocument;
+
+const credential = props.credential;
 const isDetailView = props.isDetailView ?? false;
 const manifest = props.credential?.manifest != "{}" ? props.credential?.manifest : null
 const manifestDisplay = manifest ? (typeof manifest === 'string' ? JSON.parse(manifest) : manifest)?.display : null;
@@ -54,7 +68,7 @@ const credentialImageUrl = manifestCard?.logo?.uri ?? credential?.issuer?.image?
 
 const isNotExpired = credential?.expirationDate ? new Date(credential?.expirationDate).getTime() > new Date().getTime() : true;
 
-const issuerName = manifestCard?.issuedBy ?? credential?.issuer?.name;
+const issuerName = manifestCard?.issuedBy || credential?.issuer?.name || credential?.issuer;
 
 const vcCardDiv = ref(null)
 

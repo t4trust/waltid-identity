@@ -27,7 +27,7 @@ export function useTenant() {
 
             return data.value;
         } else {
-            return config.localTenant;
+            return config.demoTenant;
         }
     });
 }

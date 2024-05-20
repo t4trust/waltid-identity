@@ -1,7 +1,7 @@
 <template>
-    <div class="flex flex-col min-h-full">
+    <div class="flex flex-col min-h-full bg-amber-50">
         <div class="w-full">
-            <img :src="logoImage" alt="walt.id logo" class="h-8 w-auto mx-auto mt-5" />
+            <img :src="logoImage" alt="walt.id logo" class="h-50 w-auto mx-auto mt-5" />
         </div>
         <div
             class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 lg:bg-white lg:bg-opacity-50">
@@ -50,8 +50,8 @@
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <button
-                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-gradient-to-br from-[#0573F0] to-[#03449E] hover:bg-blue-500']"
-                                    class="flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                                    :class="[success ? 'bg-amber-800 hover:bg-amber-800 animate-bounce' : 'bg-gradient-to-br from-amber-500 to-amber-700 hover:bg-amber-500']"
+                                    class="flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
                                     type="submit">
                                     Sign in
                                     <svg v-if="isLoggingIn" class="animate-spin ml-1.5 mr-3 h-5 w-5 text-white"
@@ -111,7 +111,7 @@
                                 </div>
                                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                                     <button
-                                        class="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-neutral-50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-700 sm:mt-0 sm:w-auto"
+                                        class="mt-3 inline-flex w-full justify-center rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-neutral-50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-700 sm:mt-0 sm:w-auto"
                                         type="button" @click="closeModal">
                                         Okay
                                     </button>

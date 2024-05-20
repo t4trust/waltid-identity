@@ -1,10 +1,10 @@
 <template>
-    <div class="flex flex-col min-h-full">
+    <div class="flex flex-col min-h-full bg-amber-50">
         <div class="w-full">
-            <img :src="logoImage" alt="walt.id logo" class="h-8 w-auto mx-auto mt-5" />
+            <img :src="logoImage" alt="walt.id logo" class="h-50 w-auto mx-auto mt-5" />
         </div>
         <div
-            class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24 lg:bg-white lg:bg-opacity-50">
+            class="flex flex-1 flex-col justify-center px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 lg:bg-white lg:bg-opacity-50">
             <div class="mx-auto w-full max-w-sm lg:w-96 p-3 lg:backdrop-blur-md lg:rounded-3xl lg:bg-opacity-40">
                 <h2 class="mt-4 text-3xl font-bold tracking-tight text-black text-center">Sign Up</h2>
                 <p class="mt-2 text-sm text-black text-center">
@@ -55,7 +55,7 @@
 
                             <div>
                                 <button
-                                    :class="[success ? 'bg-green-500 hover:bg-green-600 animate-bounce' : 'bg-gradient-to-br from-[#0573F0] to-[#03449E] hover:bg-blue-500']"
+                                    :class="[success ? 'bg-amber-800 hover:bg-amber-800 animate-bounce' : 'bg-gradient-to-br from-amber-500 to-amber-700 hover:bg-amber-500']"
                                     class="flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                                     type="submit">
                                     Sign Up

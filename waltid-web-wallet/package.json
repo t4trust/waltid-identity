@@ -20,6 +20,7 @@
     "@julr/unocss-preset-forms": "^0.1.0",
     "@pinia/nuxt": "^0.5.1",
     "jsonpath-plus": "^8.1.0",
+    "pinia": "^2.1.7",
     "qr-scanner": "^1.4.2",
     "qrcode.vue": "^3.4.1"
   },

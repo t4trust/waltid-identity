@@ -1,8 +1,8 @@
 <template>
-    <div class="min-h-full">
+    <div class="min-h-full bg-amber-50">
         <div class="flex flex-1 flex-col min-h-screen">
-            <div class="w-full">
-                <img :src="logoImage" alt="walt.id logo" class="h-8 w-auto mx-auto mt-5" />
+            <div class="w-full bg-white border-solid border-b-1 border-b-gray-60">
+                <img :src="logoImage" alt="walt.id logo" class="h-16 w-auto mx-auto my-3" />
             </div>
             <main class="flex-1 pb-8">
                 <slot />
@@ -10,10 +10,11 @@
 
             <div class="fixed bottom-0 inset-x-0">
                 <hr class="border-t border-gray-200" aria-hidden="true" />
-                <nav class="flex justify-between bg-white px-4 py-2" aria-label="Bottom navigation">
+                <nav class="flex justify-between bg-amber-800 px-4 py-2" aria-label="Bottom navigation">
                     <NuxtLink v-for="item in navigation" :key="item.name" :to="item.href"
-                        class="flex flex-col items-center text-sm text-gray-500 hover:text-gray-900">
-                        <span v-html="item.icon" class="mt-1"></span>
+                        class="flex flex-col items-center text-sm text-gray-100 hover:text-gray-900">
+                        <Icon v-if="item.iconName" :size="23" :name="item.iconName" class="mt-1"></Icon>
+                        <span v-else v-html="item.icon" class="mt-1"></span>
                         <span class="mt-1">{{ item.name }}</span>
                     </NuxtLink>
                 </nav>
@@ -56,6 +57,11 @@ const navigation = [
         icon: stackOfCardsSVG,
     },
     {
+        name: "Family",
+        href: `/wallet/${currentWallet.value}/dependents`,
+        iconName: 'mdi:account-supervisor-outline',
+    },
+    {
         name: "Profile",
         href: `/wallet/${currentWallet.value}/profile`,
         icon: profileSVG,
@@ -71,7 +77,7 @@ const secondaryNavigation = [
 
 <style>
 .router-link-exact-active {
-    color: #000;
+    color: #aaaaaa;
 }
 
 .pwa-toast {
