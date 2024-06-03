@@ -99,7 +99,7 @@ kotlin {
                 implementation("com.oracle.oci.sdk:oci-java-sdk-shaded-full:3.41.0")
 
                 // JOSE
-                implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+                implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
 
                 // walt.id
                 api(project(":waltid-crypto"))

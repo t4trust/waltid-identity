@@ -124,7 +124,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 //implementation("io.mockk:mockk:1.13.2")
-                implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+                implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
                 implementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
                 implementation("com.google.crypto.tink:tink:1.12.0") // for JOSE using Ed25519
                 // Multibase

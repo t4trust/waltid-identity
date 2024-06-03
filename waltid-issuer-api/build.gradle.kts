@@ -106,7 +106,7 @@ dependencies {
     api(project(":waltid-sdjwt"))
 
     // TODO: REMOVE:
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
 }
 
 tasks.withType<Test> {
