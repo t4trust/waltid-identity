@@ -27,7 +27,8 @@
 import CenterMain from "~/components/CenterMain.vue";
 
 const currentWallet = useCurrentWallet()
-const issuers = await useLazyFetch(`/wallet-api/wallet/${currentWallet.value}/issuers`).data;
+// const issuers = await useLazyFetch(`/wallet-api/wallet/${currentWallet.value}/issuers`).data;
+const issuers = [{ did: "Walt.id Issuer", description: "" }];
 refreshNuxtData();
 
 definePageMeta({
