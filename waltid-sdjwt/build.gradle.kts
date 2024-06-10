@@ -130,7 +130,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+                implementation("com.nimbusds:nimbus-jose-jwt:9.40")
             }
         }
         val jvmTest by getting {
