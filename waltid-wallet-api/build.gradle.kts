@@ -112,7 +112,7 @@ dependencies {
     testImplementation(project(":waltid-issuer-api"))
     testImplementation(project(":waltid-verifier-api"))
 
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.40")
 
     implementation("io.ktor:ktor-client-java:$ktor_version")
 
