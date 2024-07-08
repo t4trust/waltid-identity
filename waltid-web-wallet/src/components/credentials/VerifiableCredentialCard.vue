@@ -40,9 +40,19 @@ const props = defineProps({
     },
 });
 
-const credential = props.credential?.parsedDocument;
+function parseJwt(token: string) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+const credential = props.credential?.parsedDocument ?? parseJwt(props.credential?.document).vc
 const isDetailView = props.isDetailView ?? false;
-const manifest = props.credential?.manifest != "{}" ? props.credential?.manifest : null
+const manifest = credential?.manifest != "{}" ? credential?.manifest : null
 const manifestDisplay = manifest ? (typeof manifest === 'string' ? JSON.parse(manifest) : manifest)?.display : null;
 const manifestCard = manifestDisplay?.card;
 
